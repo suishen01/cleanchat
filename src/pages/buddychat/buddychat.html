@@ -21,9 +21,9 @@
         <img src="{{buddy.photoURL}}">
       </ion-avatar>
       <div class="bubble me" *ngIf="item.sentby === buddy.uid" (click)="showtoxic()">
-        <h3 *ngIf="item.toxicity >= tolerance && !toxicflag">Toxic message</h3>
-        <h3 *ngIf="item.toxicity < tolerance && !toxicflag">{{item.message}}</h3>
-        <h3 class="toxicmsg" *ngIf="item.toxicity >= tolerance && toxicflag">Toxic message</h3>
+        <h3 *ngIf="item.toxicity >= tolerance && !toxicflag && toxic">Toxic message</h3>
+        <h3 *ngIf="(item.toxicity < tolerance || !toxic) && !toxicflag">{{item.message}}</h3>
+        <h3 class="toxicmsg" *ngIf="item.toxicity >= tolerance && toxicflag && toxic">Toxic message</h3>
         <h3 class="strongmsg" *ngIf="item.toxicity >= tolerance/2 && item.toxicity < tolerance && toxicflag">{{item.message}}</h3>
         <h3 class="cleanmsg" *ngIf="item.toxicity < tolerance/2 && toxicflag">{{item.message}}</h3>
         <h3 class="toxicmsg" *ngIf="item.toxicity >= tolerance && toxicflag">{{item.toxicity}}</h3>
@@ -34,9 +34,9 @@
         <img src="{{photoURL}}">
       </ion-avatar>
       <div class="bubble you" *ngIf="item.sentby != buddy.uid" (click)="showtoxic()">
-        <h3 *ngIf="item.toxicity >= tolerance && !toxicflag">Toxic message</h3>
-        <h3 *ngIf="item.toxicity < tolerance && !toxicflag">{{item.message}}</h3>
-        <h3 class="toxicmsg" *ngIf="item.toxicity >= tolerance && toxicflag">Toxic message</h3>
+        <h3 *ngIf="item.toxicity >= tolerance && !toxicflag && toxic">Toxic message</h3>
+        <h3 *ngIf="(item.toxicity < tolerance || !toxic) && !toxicflag">{{item.message}}</h3>
+        <h3 class="toxicmsg" *ngIf="item.toxicity >= tolerance && toxicflag && toxic">Toxic message</h3>
         <h3 class="strongmsg" *ngIf="item.toxicity >= tolerance/2 && item.toxicity < tolerance && toxicflag">{{item.message}}</h3>
         <h3 class="cleanmsg" *ngIf="item.toxicity < tolerance/2 && toxicflag">{{item.message}}</h3>
         <h3 class="toxicmsg" *ngIf="item.toxicity >= tolerance && toxicflag">{{item.toxicity}}</h3>

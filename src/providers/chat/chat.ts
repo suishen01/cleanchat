@@ -36,37 +36,42 @@ export class ChatProvider {
             console.log(response.attributeScores.TOXICITY.summaryScore.value);
             let toxicalert = this.alertCtrl.create({
               title: 'Toxic Contents Detected',
-              subTitle: 'Your message contains toxic contents, your friend may not receive it.',
-              buttons: [{
-                        text: 'Ignore Once'
-                      },
-                      {
-                        text: 'Ignore for All',
-                        handler: () => {
-                          this.ignore = true;
+              subTitle: 'Your message contains toxic contents, Do you still want to send it?\n(\'Yes\' will show in two seconds)',
+              buttons: [
+                        {
+                          text: 'Recall it',
+                          role: 'cancel'
                         }
-                      }]
+                      ]
             });
-            if (response.attributeScores.TOXICITY.summaryScore.value >= tolerance && !this.ignore) {
-              toxicalert.present();
-            }
-            this.firebuddychats.child(firebase.auth().currentUser.uid).child(this.buddy.uid).push({
-              sentby: firebase.auth().currentUser.uid,
-              message: msg,
-              toxicity: response.attributeScores.TOXICITY.summaryScore.value,
-              timestamp: firebase.database.ServerValue.TIMESTAMP
-            }).then(() => {
-              this.firebuddychats.child(this.buddy.uid).child(firebase.auth().currentUser.uid).push({
-                sentby: firebase.auth().currentUser.uid,
-                message: msg,
-                toxicity: response.attributeScores.TOXICITY.summaryScore.value,
-                timestamp: firebase.database.ServerValue.TIMESTAMP
-              }).then(() => {
-                resolve(true);
-              }).catch((err) => {
-                reject(err);
-              })
-            })
+            toxicalert.present();
+            var that = this;
+            setTimeout(function () {
+                toxicalert.addButton(
+                          {
+                            text: 'Yes',
+                            handler: () => {
+                              that.ignore = true;
+                              that.firebuddychats.child(firebase.auth().currentUser.uid).child(that.buddy.uid).push({
+                                sentby: firebase.auth().currentUser.uid,
+                                message: msg,
+                                toxicity: response.attributeScores.TOXICITY.summaryScore.value,
+                                timestamp: firebase.database.ServerValue.TIMESTAMP
+                              }).then(() => {
+                                that.firebuddychats.child(that.buddy.uid).child(firebase.auth().currentUser.uid).push({
+                                  sentby: firebase.auth().currentUser.uid,
+                                  message: msg,
+                                  toxicity: response.attributeScores.TOXICITY.summaryScore.value,
+                                  timestamp: firebase.database.ServerValue.TIMESTAMP
+                                }).then(() => {
+                                  resolve(true);
+                                }).catch((err) => {
+                                  reject(err);
+                                })
+                              })
+                            }
+                          });
+            }, 2000);
           })
         })
       return promise;

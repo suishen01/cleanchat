@@ -26,10 +26,11 @@
   <div>
       <ion-item>
         <ion-range min="50" max="100" [(ngModel)]="saturation" color="secondary" (ionBlur)="updatetolerance($event)">
-          <ion-label range-left>100%</ion-label>
-          <ion-label range-right>0%</ion-label>
+          <ion-label range-left>0.5</ion-label>
+          <ion-label range-right>1</ion-label>
         </ion-range>
       </ion-item>
+      <p>Toxicity Tolerance : {{tolerance}}</p>
   <!--  Tap on your pic or nick name to change it.-->
   </div>
   <div class="spacer" style="height: 10px;"></div>
