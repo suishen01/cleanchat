@@ -41,7 +41,10 @@ will rebuild and work properly
 * Chat
 * Show the tolerance score of each message
 * Filter out any toxic messages based on tolerance level
+<<<<<<< HEAD
+=======
 
 ## Test Script
 * A test script between two people is created
 * To check the script, either login as youngman@test.com test123 or youngwoman@test.com test123
+>>>>>>> e49980ef8b576d2cba9d84d77c87593e36581c09
