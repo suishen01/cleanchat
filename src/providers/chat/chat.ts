@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core';
 import firebase from 'firebase';
 import { Events, AlertController } from 'ionic-angular';
 import { HttpClient } from '@angular/common/http';
+import { UserProvider } from '..//user/user';
 
 /*
   Generated class for the ChatProvider provider.
@@ -15,10 +16,13 @@ export class ChatProvider {
   buddy: any;
   buddymessages = [];
   ignore = false;
+  tolerance;
   url = ('https://commentanalyzer.googleapis.com/v1alpha1/comments:analyze' +
       '?key=AIzaSyDqLLJeJgVpERW-ccwqCipy5JdEX0kKXjQ');
-  constructor(public events: Events, private http: HttpClient, public alertCtrl: AlertController) {
-
+  constructor(public events: Events, private http: HttpClient, public alertCtrl: AlertController, public userservice: UserProvider) {
+    this.userservice.getuserdetails().then((res: any) => {
+      this.tolerance = res.tolerance;
+    });
   }
 
   initializebuddy(buddy) {
@@ -33,45 +37,64 @@ export class ChatProvider {
             languages: ['en'],
             requestedAttributes: {'TOXICITY': {}}
           }).subscribe((response) => {
-            console.log(response.attributeScores.TOXICITY.summaryScore.value);
-            let toxicalert = this.alertCtrl.create({
-              title: 'Toxic Contents Detected',
-              subTitle: 'Your message contains toxic contents, Do you still want to send it?\n(\'Yes\' will show in two seconds)',
-              buttons: [
-                        {
-                          text: 'Recall it',
-                          role: 'cancel'
-                        }
-                      ]
-            });
-            toxicalert.present();
-            var that = this;
-            setTimeout(function () {
-                toxicalert.addButton(
+            if (response.attributeScores.TOXICITY.summaryScore.value >= this.tolerance) {
+              let toxicalert = this.alertCtrl.create({
+                title: 'Toxic Contents Detected',
+                subTitle: 'Your message contains toxic contents, Do you still want to send it?\n(\'Yes\' will show in two seconds)',
+                buttons: [
                           {
-                            text: 'Yes',
-                            handler: () => {
-                              that.ignore = true;
-                              that.firebuddychats.child(firebase.auth().currentUser.uid).child(that.buddy.uid).push({
-                                sentby: firebase.auth().currentUser.uid,
-                                message: msg,
-                                toxicity: response.attributeScores.TOXICITY.summaryScore.value,
-                                timestamp: firebase.database.ServerValue.TIMESTAMP
-                              }).then(() => {
-                                that.firebuddychats.child(that.buddy.uid).child(firebase.auth().currentUser.uid).push({
+                            text: 'Recall it',
+                            role: 'cancel'
+                          }
+                        ]
+              });
+              toxicalert.present();
+              var that = this;
+              setTimeout(function () {
+                  toxicalert.addButton(
+                            {
+                              text: 'Yes',
+                              handler: () => {
+                                that.ignore = true;
+                                that.firebuddychats.child(firebase.auth().currentUser.uid).child(that.buddy.uid).push({
                                   sentby: firebase.auth().currentUser.uid,
                                   message: msg,
                                   toxicity: response.attributeScores.TOXICITY.summaryScore.value,
                                   timestamp: firebase.database.ServerValue.TIMESTAMP
                                 }).then(() => {
-                                  resolve(true);
-                                }).catch((err) => {
-                                  reject(err);
+                                  that.firebuddychats.child(that.buddy.uid).child(firebase.auth().currentUser.uid).push({
+                                    sentby: firebase.auth().currentUser.uid,
+                                    message: msg,
+                                    toxicity: response.attributeScores.TOXICITY.summaryScore.value,
+                                    timestamp: firebase.database.ServerValue.TIMESTAMP
+                                  }).then(() => {
+                                    resolve(true);
+                                  }).catch((err) => {
+                                    reject(err);
+                                  })
                                 })
-                              })
-                            }
-                          });
-            }, 2000);
+                              }
+                            });
+              }, 2000);
+            } else {
+              this.firebuddychats.child(firebase.auth().currentUser.uid).child(this.buddy.uid).push({
+                sentby: firebase.auth().currentUser.uid,
+                message: msg,
+                toxicity: response.attributeScores.TOXICITY.summaryScore.value,
+                timestamp: firebase.database.ServerValue.TIMESTAMP
+              }).then(() => {
+                this.firebuddychats.child(this.buddy.uid).child(firebase.auth().currentUser.uid).push({
+                  sentby: firebase.auth().currentUser.uid,
+                  message: msg,
+                  toxicity: response.attributeScores.TOXICITY.summaryScore.value,
+                  timestamp: firebase.database.ServerValue.TIMESTAMP
+                }).then(() => {
+                  resolve(true);
+                }).catch((err) => {
+                  reject(err);
+                })
+              });
+            }
           })
         })
       return promise;
