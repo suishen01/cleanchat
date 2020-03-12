@@ -1,5 +1,6 @@
 import { Component, NgZone } from '@angular/core';
-import { IonicPage, NavController, NavParams, AlertController } from 'ionic-angular';
+import { IonicPage, NavController, NavParams, AlertController, LoadingController } from 'ionic-angular';
+import { ImghandlerProvider } from '../../providers/imghandler/imghandler';
 import { UserProvider } from '../../providers/user/user';
 import firebase from 'firebase';
 /**
@@ -14,17 +15,53 @@ import firebase from 'firebase';
   templateUrl: 'profile.html',
 })
 export class ProfilePage {
+  imgurl = 'https://firebasestorage.googleapis.com/v0/b/myapp-4eadd.appspot.com/o/chatterplace.png?alt=media&token=e51fa887-bfc6-48ff-87c6-e2c61976534e';
+  moveon = true;
   avatar: string;
   displayName: string;
   tolerance: number;
   saturation: number;
   uid: string;
-  constructor(public navCtrl: NavController, public navParams: NavParams,
-    public userservice: UserProvider, public zone: NgZone, public alertCtrl: AlertController) {
+  constructor(public navCtrl: NavController, public navParams: NavParams, public imgservice: ImghandlerProvider,
+    public userservice: UserProvider, public zone: NgZone, public alertCtrl: AlertController, public loadingCtrl: LoadingController) {
   }
 
   ionViewWillEnter() {
     this.loaduserdetails();
+  }
+
+  chooseimage() {
+    let loader = this.loadingCtrl.create({
+      content: 'Please wait'
+    })
+    loader.present();
+    this.imgservice.uploadimage().then((uploadedurl: any) => {
+      loader.dismiss();
+      this.zone.run(() => {
+        this.imgurl = uploadedurl;
+        this.moveon = false;
+      })
+    })
+  }
+
+  updateproceed() {
+    let loader = this.loadingCtrl.create({
+      content: 'Please wait'
+    })
+    loader.present();
+    this.userservice.updateimage(this.imgurl).then((res: any) => {
+      loader.dismiss();
+      if (res.success) {
+        this.navCtrl.setRoot('TabsPage');
+      }
+      else {
+        alert(res);
+      }
+    })
+  }
+
+  proceed() {
+    this.navCtrl.setRoot('TabsPage');
   }
 
   loaduserdetails() {

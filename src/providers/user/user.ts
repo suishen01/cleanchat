@@ -112,6 +112,28 @@ export class UserProvider {
     return promise;
   }
 
+  updateimage(imageurl) {
+      var promise = new Promise((resolve, reject) => {
+          this.afireauth.auth.currentUser.updateProfile({
+              displayName: this.afireauth.auth.currentUser.displayName,
+              photoURL: imageurl
+          }).then(() => {
+              firebase.database().ref('/users/' + firebase.auth().currentUser.uid).update({
+              displayName: this.afireauth.auth.currentUser.displayName,
+              photoURL: imageurl,
+              uid: firebase.auth().currentUser.uid
+              }).then(() => {
+                  resolve({ success: true });
+                  }).catch((err) => {
+                      reject(err);
+                  })
+          }).catch((err) => {
+                reject(err);
+             })
+      })
+      return promise;
+  }
+
   updatetolerance(tolerance) {
     var promise = new Promise((resolve, reject) => {
       this.afireauth.auth.currentUser.updateProfile({

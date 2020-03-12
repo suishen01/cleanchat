@@ -17,11 +17,17 @@
   <div>
     <h2 (click)="editname()">{{displayName}}</h2>
   </div>
-  <div>
-    <!--<h3>{{uid}}</h3>-->
+  <div class="profile-image">
+    <img src="{{imgurl}}">
   </div>
   <div>
-    <!--<h2 (click)="edittolerance()">{{tolerance}}</h2>-->
+    <button ion-button round outline (click)="chooseimage()">Choose an image</button>
+  </div>
+  <div [hidden]="!moveon">
+    <button ion-button round outline (click)="proceed()">Skip this step</button>
+  </div>
+  <div [hidden]="moveon">
+    <button ion-button round outline (click)="updateproceed()">Upload & proceed</button>
   </div>
   <div>
       <ion-item>

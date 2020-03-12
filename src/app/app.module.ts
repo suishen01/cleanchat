@@ -15,6 +15,11 @@ import { AuthProvider } from '../providers/auth/auth';
 import { UserProvider } from '../providers/user/user';
 import { RequestsProvider } from '../providers/requests/requests';
 import { ChatProvider } from '../providers/chat/chat';
+import { ImghandlerProvider } from '../providers/imghandler/imghandler';
+
+import { File } from '@ionic-native/file/ngx';
+import { FileChooser } from '@ionic-native/file-chooser/ngx';
+import { FilePath } from '@ionic-native/file-path/ngx';
 
 @NgModule({
   declarations: [
@@ -37,9 +42,13 @@ import { ChatProvider } from '../providers/chat/chat';
     AuthProvider,
     AngularFireAuth,
     UserProvider,
+    File,
+    FilePath,
+    FileChooser,
     RequestsProvider,
     ChatProvider,
-    ChatProvider
+    ChatProvider,
+    ImghandlerProvider
   ]
 })
 export class AppModule {}
